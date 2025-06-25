@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public TextMeshProUGUI CurrentNameText;
     public TextMeshProUGUI HighScoreText;
 
     private bool m_Started = false;
@@ -23,11 +24,13 @@ public class GameManager : MonoBehaviour
     void Start() {
 
         if (MainManager.Instance != null) {
-            HighScoreText.text = "Best Score: " + MainManager.Instance.playerName + " - Really high Score";
+            CurrentNameText.text = MainManager.Instance.playerName;
         } else {
-            HighScoreText.text = "Best Score: Unknown Player - Really high Score";
+            CurrentNameText.text = "New Player";
             Debug.LogWarning("MainManager.Instance was null in GameManager");
         }
+
+        HighScoreText.text = "High Score: " + MainManager.Instance.highScoreName + " - " + MainManager.Instance.highScore;
 
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
@@ -70,5 +73,12 @@ public class GameManager : MonoBehaviour
     public void GameOver() {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        //this is the logic that tracks and saves highScores
+        if (m_Points > MainManager.Instance.highScore) { 
+            MainManager.Instance.highScore = m_Points;
+            MainManager.Instance.highScoreName = MainManager.Instance.playerName;
+            MainManager.Instance.SaveScore();
+            Debug.Log("New High Score Saved");
+        }
     }
 }
